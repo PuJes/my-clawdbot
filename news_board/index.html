@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 深度观察 - 每日内参</title>
+    <style>
+        :root {
+            --primary: #ff2442;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-sub: #718096;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 头部设计 */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin: 0 0 15px 0;
+            background: linear-gradient(135deg, #2d3748 0%, #ff2442 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            color: var(--text-sub);
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            margin: 25px auto 0;
+            border-radius: 2px;
+        }
+
+        /* 网格布局 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 40px;
+        }
+
+        /* 卡片设计 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* 3图拼图布局 (Bento Grid Style) */
+        .card-images-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 2px;
+            height: 240px;
+            background: #fff;
+            position: relative;
+        }
+
+        .img-item {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s;
+        }
+
+        /* 第一张图：占据左侧，跨两行 */
+        .img-item:nth-child(1) {
+            grid-row: 1 / 3;
+            grid-column: 1 / 2;
+        }
+        /* 第二张图：右上 */
+        .img-item:nth-child(2) {
+            grid-row: 1 / 2;
+            grid-column: 2 / 3;
+        }
+        /* 第三张图：右下 */
+        .img-item:nth-child(3) {
+            grid-row: 2 / 3;
+            grid-column: 2 / 3;
+        }
+
+        .card:hover .img-item {
+            filter: brightness(1.05);
+        }
+
+        /* 浮动标签 */
+        .badges {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+        
+        .badge.hot {
+            color: var(--primary);
+        }
+
+        /* 内容区域 */
+        .card-content {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 0 0 20px 0;
+            line-height: 1.35;
+            color: #1a202c;
+        }
+
+        /* 深度文案框 */
+        .copy-preview {
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1; /* 虚线框增加设计感 */
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 0.95rem;
+            color: #4a5568;
+            white-space: pre-wrap;
+            margin-bottom: 25px;
+            max-height: 320px;
+            overflow-y: auto;
+            flex-grow: 1;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .copy-preview strong {
+            color: #2d3748;
+            font-weight: 700;
+        }
+        
+        .copy-preview::-webkit-scrollbar {
+            width: 6px;
+        }
+        .copy-preview::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        /* 按钮 */
+        .btn-copy {
+            padding: 16px;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+
+        .btn-download {
+            padding: 16px;
+            background: #fff;
+            color: var(--text-main);
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .btn-download:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff5f7;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 40px; /* 移动到底部更符合直觉 */
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2d3748;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            font-weight: 600;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body { padding: 20px 15px; }
+            .header h1 { font-size: 2.2rem; }
+            .grid { grid-template-columns: 1fr; }
+            .card-images-grid { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast">
+    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    <span>文案已复制，快去小红书发帖！✨</span>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>AI 深度观察站</h1>
+        <p>拒绝焦虑，只看本质。精选全球 AI 前沿话题。</p>
+    </div>
+
+    <div class="grid">
+        <!-- Card 1: Voxtral -->
+        <div class="card">
+            <div class="card-images-grid">
+                <!-- 1 Main -->
+                <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=600&auto=format&fit=crop" class="img-item" alt="Sound Wave">
+                <!-- 2 Small -->
+                <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=300&auto=format&fit=crop" class="img-item" alt="Code">
+                <img src="https://images.unsplash.com/photo-1589254065878-42c9da9e2f58?q=80&w=300&auto=format&fit=crop" class="img-item" alt="Robot Ear">
+            </div>
+            <div class="badges">
+                <span class="badge hot">🔥 HackerNews 热榜</span>
+                <span class="badge">#语音智能</span>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">🚨 语音识别变天！Mistral 发布 Voxtral 2，OpenAI 迎来最强对手？</h3>
+                <div class="copy-preview" id="text-1">🚨 语音识别变天！Mistral 发布 Voxtral 2，OpenAI 迎来最强对手？
+
+🤔 **发生了什么：**
+Mistral 刚刚开源了 Voxtral Transcribe 2，一个全新的语音转文字模型。只有 123M 参数，但性能直接硬刚 Whisper Large v3。支持多语言，延迟极低，关键是——它可以跑在你的手机或边缘设备上，无需联网。
+
+🎯 **谁需要/有什么用：**
+对于需要保护隐私的会议记录工具、实时字幕插件开发者，或者需要在断网环境下部署 AI 的硬件厂商来说，这是绝对的利好。你不再需要依赖昂贵的云端 API。
+
+💡 **深度思考：**
+"端侧智能"不再是口号。当高精度的听觉能力变得像水电一样廉价且随处可得时，我们与设备的交互方式将发生根本性重构。未来的 App 可能不仅能"看懂"你的点击，更能"听懂"你的叹气。
+
+👇 加入小红书群获取最新资讯（每8小时自动更新）
+#Mistral #Voxtral #AI语音 #开源 #黑科技 #深度思考 #程序员 #Whisper</div>
+
+                <div class="actions">
+                    <button class="btn-copy" onclick="copyText('text-1')">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        复制文案
+                    </button>
+                    <button class="btn-download" onclick="downloadImages(this)">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        下载配图
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Claude Code -->
+        <div class="card">
+            <div class="card-images-grid">
+                <!-- 1 Main -->
+                <img src="https://images.unsplash.com/photo-1618060932014-4deda4932554?q=80&w=600&auto=format&fit=crop" class="img-item" alt="Abstract Finance">
+                <!-- 2 Small -->
+                <img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=300&auto=format&fit=crop" class="img-item" alt="Code Screen">
+                <img src="https://images.unsplash.com/photo-1596558450268-9c27524ba856?q=80&w=300&auto=format&fit=crop" class="img-item" alt="CPU">
+            </div>
+            <div class="badges">
+                <span class="badge hot">💡 降本增效</span>
+                <span class="badge">#开发工具</span>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">💰 只有 1% 的程序员知道：Claude 额度耗尽？一键无缝切换本地模型！</h3>
+                <div class="copy-preview" id="text-2">💰 只有 1% 的程序员知道：Claude 额度耗尽？一键无缝切换本地模型！
+
+🤔 **发生了什么：**
+随着 Claude Code 爆火，API 额度成了一大痛点。现在有开发者搞出了"混合动力"方案：在 Claude 额度用完或处理非核心逻辑时，自动切换到本地运行的 Llama 3 或 DeepSeek。
+
+🎯 **谁需要/有什么用：**
+适合每天都在烧 Token 的独立开发者和小型初创团队。如果你经常因为额度焦虑而不敢大胆尝试代码重构，这个方案就是你的救命稻草。
+
+💡 **深度思考：**
+这不仅是省钱，更是一种信号：AI 开发正在从"单一模型依赖"转向"模型路由 (Model Routing)"。未来我们不会只用一个 AI，而是有一个"AI 调度员"，把简单任务给便宜模型，困难任务给聪明模型。
+
+👇 加入小红书群获取最新资讯（每8小时自动更新）
+#Claude #ClaudeCode #本地模型 #Ollama #DeepSeek #降本增效 #程序员 #AI开发</div>
+                <div class="actions">
+                    <button class="btn-copy" onclick="copyText('text-2')">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        复制文案
+                    </button>
+                    <button class="btn-download" onclick="downloadImages(this)">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        下载配图
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: AI Killing SaaS -->
+        <div class="card">
+            <div class="card-images-grid">
+                <!-- 1 Main -->
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600&auto=format&fit=crop" class="img-item" alt="Skyscrapers">
+                <!-- 2 Small -->
+                <img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=300&auto=format&fit=crop" class="img-item" alt="Analytics Graph">
+                <img src="https://images.unsplash.com/photo-1531297461136-82lw9b44d940?q=80&w=300&auto=format&fit=crop" class="img-item" alt="Robot Hand">
+            </div>
+            <div class="badges">
+                <span class="badge hot">📉 行业深读</span>
+                <span class="badge">#SaaS危机</span>
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">📉 SaaS 时代的黄昏：为什么 AI 正在"杀死"传统 B2B 软件？</h3>
+                <div class="copy-preview" id="text-3">📉 SaaS 时代的黄昏：为什么 AI 正在"杀死"传统 B2B 软件？
+
+🤔 **发生了什么：**
+Hacker News 今日热榜第一。核心观点是：传统的 B2B SaaS 卖的是"工具"（你要自己操作），而 AI Agent 卖的是"结果"（它帮你做）。当软件能自己完成工作时，按人头收费的 SaaS 模式将面临崩塌。
+
+🎯 **谁需要/有什么用：**
+如果你正在看 B2B 赛道的机会，或者你是产品经理。现在不要再想"怎么优化 Dashboard"，而要思考"怎么直接交付结果"。
+
+💡 **深度思考：**
+软件行业正在经历"去 UI 化"。未来的 B2B 软件可能只是一个简单的对话框，背后是无数个自动工作的 Agent。我们正在从 "Software as a Service" 进化到 "Service as a Software"。
+
+👇 加入小红书群获取最新资讯（每8小时自动更新）
+#SaaS #B2B #创业 #AI #人工智能 #行业趋势 #深度好文 #HackerNews</div>
+                <div class="actions">
+                    <button class="btn-copy" onclick="copyText('text-3')">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        复制文案
+                    </button>
+                    <button class="btn-download" onclick="downloadImages(this)">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        下载配图
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyText(id) {
+        const content = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(content).then(() => {
+            showToast();
+        }).catch(err => {
+            alert('复制失败，请手动长按文字复制');
+        });
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.querySelector('span').innerText = message || '文案已复制，快去小红书发帖！✨';
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    async function downloadImages(btn) {
+        const card = btn.closest('.card');
+        const images = card.querySelectorAll('.img-item');
+        let count = 0;
+
+        showToast('📥 正在准备下载 3 张配图...');
+
+        for (let i = 0; i < images.length; i++) {
+            const imgUrl = images[i].src;
+            try {
+                // Fetch image as blob to force download
+                const response = await fetch(imgUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                // Generate filename based on timestamp
+                a.download = `ai_news_${Date.now()}_${i+1}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                count++;
+                
+                // Small delay to prevent browser blocking multiple downloads
+                await new Promise(r => setTimeout(r, 500));
+            } catch (err) {
+                console.error('Download failed', err);
+                // Fallback: open in new tab
+                window.open(imgUrl, '_blank');
+            }
+        }
+        
+        if (count > 0) showToast(`✅ 成功触发 ${count} 张图片下载`);
+    }
+</script>
+
+</body>
+</html>
